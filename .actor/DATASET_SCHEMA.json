@@ -1,0 +1,49 @@
+{
+    "actorSpecification": 1,
+    "views": {
+        "overview": {
+            "title": "Market Analysis Overview",
+            "description": "STR market analysis results with revenue estimates, ADR, occupancy, and investment summary",
+            "transformation": {
+                "fields": [
+                    "location",
+                    "dataFreshness",
+                    "totalListingsAnalyzed",
+                    "filteredListings",
+                    "revenueEstimate.midEstimate",
+                    "revenueEstimate.confidenceLevel",
+                    "averageDailyRate.median",
+                    "occupancyEstimate.estimatedRate",
+                    "competitiveSaturation.label",
+                    "competitiveSaturation.score",
+                    "investmentSummary"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "location": {
+                        "label": "Location",
+                        "format": "text"
+                    },
+                    "revenueEstimate.midEstimate": {
+                        "label": "Est. Annual Revenue",
+                        "format": "number"
+                    },
+                    "averageDailyRate.median": {
+                        "label": "Median ADR",
+                        "format": "number"
+                    },
+                    "occupancyEstimate.estimatedRate": {
+                        "label": "Occupancy Rate",
+                        "format": "number"
+                    },
+                    "competitiveSaturation.label": {
+                        "label": "Market Saturation",
+                        "format": "text"
+                    }
+                }
+            }
+        }
+    }
+}

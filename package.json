@@ -1,0 +1,37 @@
+{
+  "name": "str-scout-apify",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Airbnb short-term rental market analyzer — revenue estimates, ADR, occupancy, saturation, amenity gaps, and AI investment summaries. The AirDNA alternative as an Apify Actor.",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts"
+  },
+  "keywords": [
+    "apify",
+    "actor",
+    "airbnb",
+    "short-term-rental",
+    "str",
+    "real-estate",
+    "market-analysis",
+    "revenue-estimation",
+    "investment",
+    "airdna-alternative"
+  ],
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "apify": "^3.0.0",
+    "apify-client": "^2.22.2",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "ioredis": "^5.10.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
