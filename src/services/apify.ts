@@ -88,12 +88,19 @@ let client: ApifyClient | null = null;
 
 function getClient(): ApifyClient {
   if (!client) {
-    // Prefer SCRAPER_APIFY_TOKEN (lets the operator route child Actor costs
-    // to a separate account from the one that owns this Actor — important
-    // because overriding APIFY_TOKEN itself breaks Actor.charge() PPE
-    // billing, which requires the run-scoped token of the Actor's owner).
-    const token = process.env.SCRAPER_APIFY_TOKEN || process.env.APIFY_TOKEN;
-    if (!token) throw new Error("Neither SCRAPER_APIFY_TOKEN nor APIFY_TOKEN configured");
+    // Prefer an operator-supplied token for child Actor calls so scraper
+    // costs can be routed to a separate account from the Actor's owner.
+    // Overriding APIFY_TOKEN itself breaks Actor.charge() PPE billing,
+    // so we keep that env var alone and look for a sibling override.
+    const token =
+      process.env.SCRAPER_APIFY_TOKEN ||
+      process.env.STARTER_APIFY_TOKEN ||
+      process.env.APIFY_TOKEN;
+    if (!token) {
+      throw new Error(
+        "Neither SCRAPER_APIFY_TOKEN, STARTER_APIFY_TOKEN, nor APIFY_TOKEN configured",
+      );
+    }
     client = new ApifyClient({ token });
   }
   return client;
