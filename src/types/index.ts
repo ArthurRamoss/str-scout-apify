@@ -208,6 +208,7 @@ export interface MarketAnalysis {
   cachedAt: string | null;
   totalListingsAnalyzed: number;
   filteredListings: number;
+  amenityDataAvailable: boolean;
   revenueEstimate: RevenueEstimate;
   averageDailyRate: AverageDailyRate;
   occupancyEstimate: OccupancyEstimate;
@@ -215,4 +216,101 @@ export interface MarketAnalysis {
   amenityGapAnalysis: AmenityGapAnalysis;
   topComparables: TopComparable[];
   investmentSummary: string;
+}
+
+// ==========================================
+// Search Listings tool
+// ==========================================
+
+export interface CompactListing {
+  id: string;
+  name: string;
+  url: string;
+  pricePerNight: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  rating: number | null;
+  reviewCount: number;
+  isSuperhost: boolean;
+  lat: number | null;
+  lng: number | null;
+}
+
+export interface SearchListingsResult {
+  city: string;
+  dataFreshness: DataFreshness;
+  count: number;
+  listings: CompactListing[];
+}
+
+// ==========================================
+// Regulations tool
+// ==========================================
+
+export type RegulationStatus =
+  | "permitted"
+  | "restricted"
+  | "banned"
+  | "capped"
+  | "unknown";
+
+export interface RegulationDetails {
+  licenseRequired: boolean | null;
+  licenseType: string | null;
+  ownerOccupancyRequired: boolean | null;
+  nightLimit: number | null;
+  feeUsd: number | null;
+  renewalMonths: number | null;
+}
+
+export interface RegulationSource {
+  label: string;
+  url: string;
+}
+
+export interface RegulationRecord {
+  city: string;
+  country: string;
+  status: RegulationStatus;
+  summary: string;
+  details: RegulationDetails;
+  sources: RegulationSource[];
+  lastUpdated: string;
+}
+
+// ==========================================
+// Arbitrage Score tool
+// ==========================================
+
+export interface ArbitrageSubscores {
+  regulation: number;
+  demand: number;
+  profitability: number;
+  saturation: number;
+}
+
+export type ArbitrageRecommendation = "viable" | "marginal" | "avoid";
+
+export interface ArbitrageScore {
+  total: number;
+  subscores: ArbitrageSubscores;
+  projectedAnnualRevenue: number;
+  projectedNetIncome: number;
+  breakEvenOccupancy: number;
+  recommendation: ArbitrageRecommendation;
+  warnings: string[];
+}
+
+export interface ArbitrageReport {
+  address: string;
+  city: string;
+  score: ArbitrageScore;
+  narrative: string;
+  marketSnapshot: {
+    medianAdr: number;
+    estimatedOccupancy: number;
+    saturationLabel: string;
+    listingsAnalyzed: number;
+  };
+  regulationStatus: RegulationStatus;
 }

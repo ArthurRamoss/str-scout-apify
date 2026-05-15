@@ -1,74 +1,52 @@
 import "dotenv/config";
 import { Actor } from "apify";
-import express, { type Request, type Response } from "express";
-import { handleAnalyzeMarket } from "./tools/analyzeMarket.js";
+import express from "express";
+import { restRouter } from "./http/routes.js";
+import { discoveryRouter } from "./http/discovery.js";
+import { mcpHandler } from "./mcp/transport.js";
+import { handleMarketAnalysis } from "./tools/marketAnalysis.js";
 
-const isStandby = process.env.ACTOR_STANDBY_PORT || process.env.APIFY_ACTOR_STANDBY_PORT;
+const isStandby = !!(
+  process.env.ACTOR_STANDBY_PORT || process.env.APIFY_ACTOR_STANDBY_PORT
+);
 
 if (isStandby) {
+  await Actor.init();
+
   const app = express();
-  app.use(express.json());
+  app.use(express.json({ limit: "1mb" }));
 
-  app.get("/", (_req: Request, res: Response) => {
-    res.json({
-      status: "ok",
-      service: "str-scout",
-      version: "1.0.0",
-      mode: "standby",
-      timestamp: new Date().toISOString(),
-    });
-  });
+  app.use(discoveryRouter);
+  app.use(restRouter);
+  app.post("/mcp", mcpHandler);
 
-  app.post("/", async (req: Request, res: Response) => {
-    const { location, propertyType, bedrooms, checkIn, checkOut } = req.body ?? {};
-
-    if (!location) {
-      res.status(400).json({ error: "location is required" });
-      return;
-    }
-
-    try {
-      const result = await handleAnalyzeMarket({
-        location,
-        propertyType,
-        bedrooms,
-        checkIn,
-        checkOut,
-      });
-
-      await Actor.charge({ eventName: "market-analysis" });
-
-      res.json(result.structuredContent);
-    } catch (err: any) {
-      console.error(`[standby] Analysis failed: ${err.message}`);
-      res.status(500).json({ error: err.message });
-    }
+  app.use((req, res) => {
+    res.status(404).json({ error: "NotFound", path: req.path });
   });
 
   const port = Number(
     process.env.ACTOR_STANDBY_PORT ||
-    process.env.APIFY_ACTOR_STANDBY_PORT ||
-    process.env.PORT ||
-    3000
+      process.env.APIFY_ACTOR_STANDBY_PORT ||
+      process.env.PORT ||
+      3000,
   );
 
   app.listen(port, () => {
-    console.log(`STR Scout standby server running on port ${port}`);
+    console.log(`STR Scout standby server listening on port ${port}`);
   });
 } else {
   await Actor.init();
-
   try {
     const input = (await Actor.getInput<Record<string, unknown>>()) ?? {};
     const { location, propertyType, bedrooms, checkIn, checkOut } = input;
 
     if (!location || typeof location !== "string") {
-      throw new Error("Input must include a 'location' string (e.g. 'Austin, TX')");
+      throw new Error("Input must include a 'location' string (e.g. 'Lisbon')");
     }
 
-    console.log(`[batch] Running STR Scout analysis for "${location}"`);
+    console.log(`[batch] Running market analysis for "${location}"`);
 
-    const result = await handleAnalyzeMarket({
+    const result = await handleMarketAnalysis({
       location,
       propertyType,
       bedrooms,
@@ -76,14 +54,11 @@ if (isStandby) {
       checkOut,
     });
 
-    await Actor.pushData(result.structuredContent);
-    await Actor.charge({ eventName: "market-analysis" });
-
-    console.log(`[batch] Analysis complete for "${location}"`);
+    await Actor.pushData(result.structuredContent as any);
+    console.log(`[batch] Done — pushed analysis for "${location}"`);
   } catch (err: any) {
-    console.error(`[batch] Fatal error: ${err.message}`);
+    console.error(`[batch] Fatal: ${err.message}`);
     await Actor.fail(err.message);
   }
-
   await Actor.exit();
 }

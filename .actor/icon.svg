@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0EA5E9"/>
+      <stop offset="100%" stop-color="#1E40AF"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="180" fill="url(#bg)"/>
+  <g fill="none" stroke="#FFFFFF" stroke-width="48" stroke-linecap="round" stroke-linejoin="round">
+    <!-- House -->
+    <path d="M 280 540 L 480 360 L 680 540 L 680 760 L 280 760 Z"/>
+    <!-- Roof line accent -->
+    <path d="M 250 560 L 480 360 L 710 560" stroke-width="56"/>
+    <!-- Door -->
+    <path d="M 440 760 L 440 660 L 520 660 L 520 760"/>
+    <!-- Magnifying glass circle -->
+    <circle cx="700" cy="700" r="120" fill="#0EA5E9"/>
+    <circle cx="700" cy="700" r="120"/>
+    <!-- Magnifying glass handle -->
+    <line x1="788" y1="788" x2="880" y2="880"/>
+  </g>
+</svg>

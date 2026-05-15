@@ -26,6 +26,7 @@ RUN npm --quiet set progress=false \
     && rm -r ~/.npm
 
 COPY --from=builder /app/dist ./dist
+COPY src/data ./dist/data
 COPY .actor ./.actor
 
 ENV NODE_ENV=production

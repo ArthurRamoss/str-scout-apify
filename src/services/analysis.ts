@@ -36,19 +36,20 @@ function mean(arr: number[]): number {
 // ==========================================
 
 function extractPrice(listing: AirbnbListing): number | null {
-  // tri_angle/airbnb-scraper detailed format
-  if (listing.price?.amount) {
-    const num = parseFloat(listing.price.amount.replace(/[^0-9.]/g, ""));
-    if (!isNaN(num) && num > 0) return num;
-  }
-  if (listing.price?.label) {
-    const match = listing.price.label.match(/\$?([\d,]+)/);
-    if (match) {
-      const num = parseFloat(match[1].replace(/,/g, ""));
+  const p = listing.price;
+  if (p && typeof p === "object") {
+    if (p.amount) {
+      const num = parseFloat(String(p.amount).replace(/[^0-9.]/g, ""));
       if (!isNaN(num) && num > 0) return num;
     }
+    if (p.label) {
+      const match = String(p.label).match(/\$?([\d,]+)/);
+      if (match) {
+        const num = parseFloat(match[1].replace(/,/g, ""));
+        if (!isNaN(num) && num > 0) return num;
+      }
+    }
   }
-  // Other scraper formats
   if (typeof listing.pricing === "number" && listing.pricing > 0) {
     return listing.pricing;
   }
@@ -248,7 +249,10 @@ export function calculateSaturation(
     (l) =>
       l.isSuperHost ||
       l.host?.isSuperHost ||
-      (l.badges && l.badges.some((b) => b.toLowerCase().includes("favorite")))
+      (l.badges && l.badges.some((b) => {
+        const text = typeof b === "string" ? b : b.label;
+        return text?.toLowerCase().includes("favorite");
+      }))
   );
   const guestFavoritePercent = (guestFavorites.length / total) * 100;
 
@@ -363,11 +367,18 @@ export function analyzeAmenities(listings: AirbnbListing[]): AmenityGapAnalysis 
     const counts = new Map<string, number>();
     for (const listing of group) {
       if (!listing.amenities) continue;
-      const allAmenities = listing.amenities
-        .flatMap((cat) => cat.values)
-        .filter((v) => v.available === true)
-        .map((v) => v.title);
-
+      const allAmenities: string[] = [];
+      for (const entry of listing.amenities as Array<any>) {
+        if (entry && Array.isArray(entry.values)) {
+          // AmenityCategory: { title, values: [{title, available}] }
+          for (const v of entry.values) {
+            if (v?.available === true && v.title) allAmenities.push(v.title);
+          }
+        } else if (entry && entry.available === true && entry.title) {
+          // FlatAmenity: { groupName, title, available }
+          allAmenities.push(entry.title);
+        }
+      }
       for (const amenity of allAmenities) {
         counts.set(amenity, (counts.get(amenity) || 0) + 1);
       }

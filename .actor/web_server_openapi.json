@@ -1,0 +1,130 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "STR Scout",
+        "version": "0.1.0",
+        "description": "Short-term rental market intelligence — search listings, market analysis, regulations, and arbitrage scoring. Each tool is also exposed via MCP at POST /mcp."
+    },
+    "servers": [
+        { "url": "https://{actorRunUrl}", "variables": { "actorRunUrl": { "default": "your-standby-url" } } }
+    ],
+    "paths": {
+        "/health": {
+            "get": {
+                "summary": "Service health",
+                "responses": {
+                    "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "object" } } } }
+                }
+            }
+        },
+        "/tools": {
+            "get": {
+                "summary": "List available tools and their JSON Schemas",
+                "responses": {
+                    "200": { "description": "Tool catalog", "content": { "application/json": { "schema": { "type": "object" } } } }
+                }
+            }
+        },
+        "/search-listings": {
+            "post": {
+                "summary": "Search short-term rental listings in a city",
+                "description": "Returns up to 100 compact listing records filtered by bedrooms, price range, and property type. Charged as tool-call-search-listings ($0.05).",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["city"],
+                                "properties": {
+                                    "city": { "type": "string", "minLength": 2, "example": "Austin, TX" },
+                                    "bedrooms": { "type": "integer", "minimum": 0, "maximum": 10 },
+                                    "bathrooms": { "type": "number", "minimum": 0, "maximum": 10 },
+                                    "minPrice": { "type": "number", "minimum": 0 },
+                                    "maxPrice": { "type": "number", "minimum": 0 },
+                                    "propertyType": { "type": "string", "enum": ["entire_home", "private_room", "any"], "default": "entire_home" },
+                                    "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 25 }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": { "200": { "description": "Search results" } }
+            }
+        },
+        "/regulations": {
+            "post": {
+                "summary": "Look up local STR regulations for a city",
+                "description": "Returns regulatory status (permitted/restricted/banned/capped/unknown), license requirements, night caps, fees. Charged as tool-call-regulations ($0.10).",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["city"],
+                                "properties": {
+                                    "city": { "type": "string", "minLength": 2, "example": "Austin" },
+                                    "state": { "type": "string", "minLength": 2, "maxLength": 2, "example": "TX" },
+                                    "country": { "type": "string", "minLength": 2, "maxLength": 2, "default": "US" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": { "200": { "description": "Regulation record" } }
+            }
+        },
+        "/market-analysis": {
+            "post": {
+                "summary": "Full market intelligence report for a city",
+                "description": "Revenue estimates, ADR percentiles, occupancy, saturation, amenity gaps, top comparables, AI investment summary. Charged as tool-call-market-analysis ($0.50).",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["location"],
+                                "properties": {
+                                    "location": { "type": "string", "minLength": 2, "example": "Lisbon" },
+                                    "propertyType": { "type": "string", "enum": ["entire_home", "private_room", "any"], "default": "entire_home" },
+                                    "bedrooms": { "type": "integer", "minimum": 0, "maximum": 10 },
+                                    "checkIn": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+                                    "checkOut": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": { "200": { "description": "MarketAnalysis object" } }
+            }
+        },
+        "/arbitrage-score": {
+            "post": {
+                "summary": "Score a property address for STR conversion viability",
+                "description": "Composite 0-100 score combining regulation, demand, profitability, saturation. Returns recommendation, projected revenue and net income, break-even occupancy, AI narrative. Charged as tool-call-arbitrage-score ($1.00).",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["address", "city", "bedrooms"],
+                                "properties": {
+                                    "address": { "type": "string", "minLength": 5, "example": "123 Main St, Austin TX 78701" },
+                                    "city": { "type": "string", "minLength": 2, "example": "Austin" },
+                                    "monthlyRent": { "type": "number", "minimum": 0 },
+                                    "bedrooms": { "type": "integer", "minimum": 0, "maximum": 10 },
+                                    "bathrooms": { "type": "number", "minimum": 0, "maximum": 10 },
+                                    "propertyType": { "type": "string", "enum": ["entire_home", "private_room"], "default": "entire_home" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": { "200": { "description": "ArbitrageReport object" } }
+            }
+        }
+    }
+}

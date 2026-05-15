@@ -1,89 +1,114 @@
-# STR Scout — Airbnb Market Analyzer
+# STR Scout — Short-Term Rental Market Intelligence
 
-**The AirDNA alternative at pay-per-query pricing.** Analyze any Airbnb short-term rental market in seconds instead of paying $250+/month for a subscription.
+Short-term rental market intelligence with **4 tools** accessible via **MCP**, **REST**, or batch run. Built for STR investors, hosts, property managers, and AI agents that need market data on demand.
 
-## What it does
+## What you get
 
-STR Scout scrapes live Airbnb listings for any location and runs a full investment-grade market analysis:
+- **Search comparable listings** by city with bedroom/price/property-type filters
+- **Local regulation lookup** — permitted, restricted, banned, or capped, plus license requirements and night caps
+- **Full market analysis** — revenue estimates, ADR percentiles, occupancy, saturation scoring, amenity gaps, comparables, and AI investment summary
+- **Arbitrage score** for a specific address (0-100) with regulation-aware viability recommendation, projected net income, and break-even occupancy
 
-- **Revenue Estimation** — Annual revenue projections with confidence intervals (low / mid / high) based on comparable listings
-- **Average Daily Rate (ADR)** — Median, 25th, and 75th percentile nightly rates so you know where to price
-- **Occupancy Modeling** — Estimated occupancy rates derived from review velocity analysis (no guesswork)
-- **Competitive Saturation Scoring** — A 0-100 score telling you if the market is undersupplied, balanced, competitive, or oversaturated
-- **Amenity Gap Detection** — Identifies amenities that top-performing listings have but the average listing doesn't, revealing the highest-ROI upgrades
-- **AI Investment Summary** — A Gemini-powered narrative summarizing key takeaways and investment recommendation
-- **Top Comparables** — The 5 most relevant comparable listings with pricing, ratings, and links
+## Disclaimer
 
-## Who is this for?
+> STR Scout aggregates publicly available data and analytical estimates. Output is informational only and does not constitute investment, legal, or tax advice. Regulatory data may be out of date — verify with the local jurisdiction before transacting. STR Scout is not affiliated with, endorsed by, or sponsored by Airbnb, Inc., or any third-party platform.
 
-| Use Case | How STR Scout Helps |
-|---|---|
-| **Real estate investors** | Evaluate STR income potential before buying a property |
-| **Airbnb hosts** | Benchmark your pricing against the local market |
-| **Property managers** | Identify amenity gaps and optimize listings for more bookings |
-| **Market researchers** | Get structured market data without expensive subscriptions |
+## Tools and pricing
 
-## How to use
+| Tool | Price per call | Use case |
+|---|---|---|
+| `search-listings` | $0.05 | Discover comparable listings in a city |
+| `regulations` | $0.10 | Check whether a city allows STR (kills bad deals fast) |
+| `market-analysis` | $0.50 | Full market report — revenue, ADR, occupancy, saturation, AI summary |
+| `arbitrage-score` | $1.00 | Score a property address (0-100) for STR viability |
 
-### Batch Mode (Standard Apify Run)
+Pricing is **pay-per-event**. You are only charged when a tool successfully starts; failed validations and platform errors are not billed at the tool rate.
 
-Set the input with a `location` (required) and optional filters, then run the Actor. Results are pushed to the default dataset.
+## Use from an MCP client (Claude Desktop, Cursor, Cline, etc.)
 
-**Example input:**
 ```json
 {
-    "location": "Austin, TX",
-    "propertyType": "entire_home",
-    "bedrooms": 2
+  "mcpServers": {
+    "str-scout": {
+      "url": "https://<your-actor-standby-url>/mcp",
+      "headers": { "Authorization": "Bearer <your-apify-token>" }
+    }
+  }
 }
 ```
 
-### Standby Mode (HTTP API)
+Once connected, the four tools appear in your client's tool palette. Use them like:
 
-The Actor also supports standby mode for low-latency HTTP requests:
+> "Use str-scout to look up the regulations for Austin, then run a market analysis for 2-bedroom entire homes there."
+
+## Use from REST / curl
 
 ```bash
-curl -X POST https://your-actor-standby-url/ \
+curl -X POST https://<your-actor-standby-url>/market-analysis \
+  -H "Authorization: Bearer $APIFY_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"location": "Miami Beach, FL", "propertyType": "entire_home"}'
+  -d '{"location":"Austin, TX","bedrooms":2}'
 ```
 
-## Output
+Discover the available tool surface at `GET /tools` and the OpenAPI spec at `GET /openapi.json`.
 
-Each run produces a structured JSON object with:
+## Use as a one-shot Apify run (batch mode)
 
-| Field | Description |
-|---|---|
-| `location` | The analyzed market |
-| `dataFreshness` | Whether data is live or cached |
-| `totalListingsAnalyzed` | Number of Airbnb listings scraped |
-| `filteredListings` | Listings matching your property type / bedroom filters |
-| `revenueEstimate` | Low, mid, high annual revenue with confidence level |
-| `averageDailyRate` | Median and percentile ADR |
-| `occupancyEstimate` | Estimated occupancy rate and methodology |
-| `competitiveSaturation` | Score (0-100), label, listing count, avg rating |
-| `amenityGapAnalysis` | Top performer amenities + recommended additions |
-| `topComparables` | 5 best comparable listings with links |
-| `investmentSummary` | AI-generated narrative summary |
+Click **Start** with the default input, or override `location`, `propertyType`, `bedrooms`. The market analysis is pushed to the run's default dataset.
 
-## Pricing
+```json
+{ "location": "Lisbon", "propertyType": "entire_home", "bedrooms": 2 }
+```
 
-This Actor uses **pay-per-event** pricing. You are charged per successful market analysis. Check the Actor's pricing tab for current rates.
+## Output (market-analysis example)
 
-## Input parameters
+```json
+{
+  "location": "Lisbon",
+  "dataFreshness": "cached_48h",
+  "totalListingsAnalyzed": 1247,
+  "filteredListings": 421,
+  "revenueEstimate": { "lowEstimate": 28400, "midEstimate": 41200, "highEstimate": 56800, "confidenceLevel": "high" },
+  "averageDailyRate": { "median": 142, "percentile25": 98, "percentile75": 198 },
+  "occupancyEstimate": { "estimatedRate": 0.72, "confidenceLevel": "high" },
+  "competitiveSaturation": { "score": 62, "label": "competitive", "totalListings": 1247 },
+  "topComparables": [ "..." ],
+  "investmentSummary": "Lisbon shows competitive but profitable conditions..."
+}
+```
 
-| Parameter | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `location` | string | ✅ | — | City, neighborhood, or address to analyze |
-| `propertyType` | string | — | `entire_home` | `entire_home`, `private_room`, or `any` |
-| `bedrooms` | integer | — | all | Number of bedrooms (0 = studio) |
-| `checkIn` | string | — | — | Check-in date (YYYY-MM-DD) for seasonal analysis |
-| `checkOut` | string | — | — | Check-out date (YYYY-MM-DD) for seasonal analysis |
-| `currency` | string | — | `USD` | Currency code |
-| `maxResults` | integer | — | `50` | Max listings to scrape (10-200) |
+## Output (arbitrage-score example)
 
-## Data sources
+```json
+{
+  "address": "Rua de São Bento 100, Lisbon",
+  "city": "Lisbon",
+  "score": {
+    "total": 64,
+    "subscores": { "regulation": 60, "demand": 72, "profitability": 58, "saturation": 38 },
+    "projectedAnnualRevenue": 36800,
+    "projectedNetIncome": 12400,
+    "breakEvenOccupancy": 0.51,
+    "recommendation": "marginal",
+    "warnings": ["Lisbon AL containment zones suspend new licenses in central districts."]
+  },
+  "narrative": "Score 64/100 (marginal). Lisbon's AL framework allows operation outside containment zones..."
+}
+```
 
-- **Listings data**: Scraped from Airbnb via the [curious_coder/airbnb-scraper](https://apify.com/curious_coder/airbnb-scraper) Apify Actor
-- **AI summaries**: Generated with Google Gemini
-- **Caching**: Results are cached to reduce costs on repeated queries for the same location
+## Coverage
+
+- **Open-data feeds** — ~30 metros across North America, Europe, and Asia-Pacific (Austin, NYC, LA, SF, Boston, Chicago, Lisbon, Porto, Barcelona, Madrid, Paris, London, Berlin, Amsterdam, Rome, Milan, Athens, Sydney, Melbourne, Mexico City, Buenos Aires, Rio, Vienna, Copenhagen, Edinburgh, Asheville, Denver, San Diego, Seattle, Nashville, and more)
+- **Live market scrape fallback** — any other city, slower cold start (5-30s on first request)
+- **Regulatory data** — 10 cities in v1 (NYC, SF, LA, Austin, Nashville, Miami Beach, Lisbon, Barcelona, Paris, London); other cities return `unknown`
+
+## Limits and known issues
+
+- Amenity-gap analysis is reduced for cities served by open-data feeds (the open feed doesn't carry amenity arrays)
+- First request to a new city has 5-30s cold start while data loads; subsequent requests are sub-second
+- Regulations data is hand-curated and refreshed quarterly — always verify with local jurisdiction before transacting
+- ADR/occupancy estimates use a review-velocity model with assumed 60% review rate and 3.5-night average stay; actual performance varies
+
+## Support
+
+Issues, feature requests, or city additions: contact via Apify Console messaging.

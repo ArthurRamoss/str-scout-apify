@@ -1,0 +1,185 @@
+{
+  "_notes": "Hand-curated short-term rental regulation records. Refresh quarterly. Disclaim heavily — informational only, not legal advice; verify with local jurisdiction.",
+  "records": {
+    "new-york-ny": {
+      "city": "New York, NY",
+      "country": "US",
+      "status": "restricted",
+      "summary": "Local Law 18 (2023) restricts short-term rentals: host must be present, max 2 guests, primary residence only, registration with the Mayor's Office of Special Enforcement required. Effectively bans non-hosted whole-home STR.",
+      "details": {
+        "licenseRequired": true,
+        "licenseType": "OSE Registration",
+        "ownerOccupancyRequired": true,
+        "nightLimit": null,
+        "feeUsd": 145,
+        "renewalMonths": 24
+      },
+      "sources": [
+        { "label": "NYC OSE Short-Term Rental Registration", "url": "https://www.nyc.gov/site/specialenforcement/registration-law/registration-law.page" }
+      ],
+      "lastUpdated": "2024-11-01"
+    },
+    "san-francisco-ca": {
+      "city": "San Francisco, CA",
+      "country": "US",
+      "status": "restricted",
+      "summary": "Primary residence required. Hosted rentals unlimited; un-hosted whole-home rentals capped at 90 nights/year. Office of Short-Term Rentals registration mandatory.",
+      "details": {
+        "licenseRequired": true,
+        "licenseType": "STR Certificate",
+        "ownerOccupancyRequired": true,
+        "nightLimit": 90,
+        "feeUsd": 1056,
+        "renewalMonths": 24
+      },
+      "sources": [
+        { "label": "SF Office of Short-Term Rentals", "url": "https://sfplanning.org/short-term-rentals" }
+      ],
+      "lastUpdated": "2024-11-01"
+    },
+    "los-angeles-ca": {
+      "city": "Los Angeles, CA",
+      "country": "US",
+      "status": "capped",
+      "summary": "Home-Sharing Ordinance: 120-night annual cap on hosted rentals. Extended Home-Sharing permit lifts the cap for primary residences after additional review. Non-primary residences cannot be used as STR.",
+      "details": {
+        "licenseRequired": true,
+        "licenseType": "Home-Sharing Permit",
+        "ownerOccupancyRequired": true,
+        "nightLimit": 120,
+        "feeUsd": 89,
+        "renewalMonths": 12
+      },
+      "sources": [
+        { "label": "LA Planning — Home-Sharing", "url": "https://planning.lacity.gov/development-services/home-sharing" }
+      ],
+      "lastUpdated": "2024-11-01"
+    },
+    "austin-tx": {
+      "city": "Austin, TX",
+      "country": "US",
+      "status": "permitted",
+      "summary": "Three license types: Type 1 (owner-occupied), Type 2 (non-owner-occupied, restricted in residential zones), Type 3 (multifamily). Type 2 is currently subject to litigation; check current status before purchasing for STR use.",
+      "details": {
+        "licenseRequired": true,
+        "licenseType": "STR License (Type 1/2/3)",
+        "ownerOccupancyRequired": false,
+        "nightLimit": null,
+        "feeUsd": 788,
+        "renewalMonths": 12
+      },
+      "sources": [
+        { "label": "City of Austin STR Code", "url": "https://www.austintexas.gov/department/short-term-rentals" }
+      ],
+      "lastUpdated": "2024-11-01"
+    },
+    "nashville-tn": {
+      "city": "Nashville, TN",
+      "country": "US",
+      "status": "restricted",
+      "summary": "Type 1 (owner-occupied) permitted citywide. Type 2 (non-owner-occupied) banned in residential zones since 2018 (existing permits grandfathered until sale/transfer). Heavy enforcement and complaint-driven revocation.",
+      "details": {
+        "licenseRequired": true,
+        "licenseType": "STR Permit (Type 1/2)",
+        "ownerOccupancyRequired": false,
+        "nightLimit": null,
+        "feeUsd": 313,
+        "renewalMonths": 12
+      },
+      "sources": [
+        { "label": "Metro Nashville STR Permitting", "url": "https://www.nashville.gov/departments/codes/short-term-rental-permitting" }
+      ],
+      "lastUpdated": "2024-11-01"
+    },
+    "miami-beach-fl": {
+      "city": "Miami Beach, FL",
+      "country": "US",
+      "status": "restricted",
+      "summary": "STR effectively banned in single-family residential zones. Permitted zones require business tax receipt and resort tax registration. First-offense fine $20,000; escalates to $100,000 for repeats.",
+      "details": {
+        "licenseRequired": true,
+        "licenseType": "Business Tax Receipt + Resort Tax",
+        "ownerOccupancyRequired": false,
+        "nightLimit": null,
+        "feeUsd": 350,
+        "renewalMonths": 12
+      },
+      "sources": [
+        { "label": "Miami Beach STR Ordinance", "url": "https://www.miamibeachfl.gov/city-hall/code-compliance/short-term-rentals/" }
+      ],
+      "lastUpdated": "2024-11-01"
+    },
+    "lisbon": {
+      "city": "Lisbon",
+      "country": "PT",
+      "status": "capped",
+      "summary": "Alojamento Local (AL) registration required nationally. Lisbon designated 'containment zones' (Alfama, Bairro Alto, Castelo, etc.) where new AL licenses are suspended. Revogação Mais Habitação law (2023) initially banned new AL nationwide; partially reversed in 2024.",
+      "details": {
+        "licenseRequired": true,
+        "licenseType": "Alojamento Local (AL)",
+        "ownerOccupancyRequired": false,
+        "nightLimit": null,
+        "feeUsd": null,
+        "renewalMonths": null
+      },
+      "sources": [
+        { "label": "Turismo de Portugal — AL", "url": "https://rnt.turismodeportugal.pt/" }
+      ],
+      "lastUpdated": "2024-11-01"
+    },
+    "barcelona": {
+      "city": "Barcelona",
+      "country": "ES",
+      "status": "banned",
+      "summary": "Effectively banned for new operators. No new HUTB tourist licenses issued since 2014; existing licenses transferable but values inflated. Mayor announced full STR phase-out by November 2028 (existing licenses non-renewable).",
+      "details": {
+        "licenseRequired": true,
+        "licenseType": "HUTB Tourist Apartment License",
+        "ownerOccupancyRequired": false,
+        "nightLimit": null,
+        "feeUsd": null,
+        "renewalMonths": null
+      },
+      "sources": [
+        { "label": "Generalitat de Catalunya HUT Registry", "url": "https://establimentsturistics.gencat.cat/" }
+      ],
+      "lastUpdated": "2024-11-01"
+    },
+    "paris": {
+      "city": "Paris",
+      "country": "FR",
+      "status": "capped",
+      "summary": "Primary residences capped at 120 nights/year (reduced to 90 from 2025 in some districts). Second homes require 'changement d'usage' authorization with mandatory commercial-use compensation. Mandatory registration number on every listing.",
+      "details": {
+        "licenseRequired": true,
+        "licenseType": "Numéro d'enregistrement",
+        "ownerOccupancyRequired": false,
+        "nightLimit": 120,
+        "feeUsd": 0,
+        "renewalMonths": null
+      },
+      "sources": [
+        { "label": "Paris.fr — Meublés de tourisme", "url": "https://www.paris.fr/pages/locations-meublees-touristiques-2244" }
+      ],
+      "lastUpdated": "2024-11-01"
+    },
+    "london": {
+      "city": "London",
+      "country": "GB",
+      "status": "capped",
+      "summary": "90-night annual cap per dwelling without planning permission (Deregulation Act 2015). Beyond 90 nights requires change-of-use planning consent — rarely granted in residential zones. Airbnb auto-enforces the 90-night cap.",
+      "details": {
+        "licenseRequired": false,
+        "licenseType": null,
+        "ownerOccupancyRequired": false,
+        "nightLimit": 90,
+        "feeUsd": null,
+        "renewalMonths": null
+      },
+      "sources": [
+        { "label": "GLA — Short-term lettings policy", "url": "https://www.london.gov.uk/programmes-strategies/planning/implementing-london-plan/london-plan-guidance/short-term-and-holiday-let-accommodation" }
+      ],
+      "lastUpdated": "2024-11-01"
+    }
+  }
+}

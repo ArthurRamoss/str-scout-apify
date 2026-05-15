@@ -1,20 +1,21 @@
 {
-    "title": "STR Scout — Airbnb Market Analyzer",
-    "description": "Analyze any short-term rental market on Airbnb. Get revenue estimates, ADR, occupancy rates, saturation scoring, amenity gap analysis, and an AI-powered investment summary.",
+    "title": "STR Scout — Market Analysis (Batch Mode)",
+    "description": "Run a single short-term rental market analysis. For multi-tool access (search-listings, regulations, arbitrage-score), use Standby mode and call the HTTP/MCP endpoints — see the Actor's documentation.",
     "type": "object",
     "schemaVersion": 1,
     "properties": {
         "location": {
             "title": "Location",
             "type": "string",
-            "description": "City, neighborhood, or address to analyze (e.g., 'Austin, TX', 'Miami Beach, FL', 'Williamsburg, Brooklyn')",
+            "description": "City to analyze. Best results for major metros covered by curated open-data feeds; other cities use a live market scrape (slower).",
             "editor": "textfield",
-            "prefill": "Austin, TX"
+            "prefill": "Lisbon",
+            "default": "Lisbon"
         },
         "propertyType": {
             "title": "Property Type",
             "type": "string",
-            "description": "Type of property to analyze",
+            "description": "Type of property to analyze.",
             "editor": "select",
             "enum": ["entire_home", "private_room", "any"],
             "enumTitles": ["Entire Home", "Private Room", "Any"],
@@ -24,43 +25,13 @@
         "bedrooms": {
             "title": "Bedrooms",
             "type": "integer",
-            "description": "Number of bedrooms to filter for. Use 0 for studio. Leave empty for all.",
+            "description": "Filter to listings with at least this many bedrooms. Leave empty for all.",
             "editor": "number",
             "minimum": 0,
             "maximum": 10,
+            "default": 2,
+            "prefill": 2,
             "nullable": true
-        },
-        "checkIn": {
-            "title": "Check-in Date",
-            "type": "string",
-            "description": "Optional check-in date for seasonal pricing analysis (YYYY-MM-DD)",
-            "editor": "textfield",
-            "nullable": true
-        },
-        "checkOut": {
-            "title": "Check-out Date",
-            "type": "string",
-            "description": "Optional check-out date for seasonal pricing analysis (YYYY-MM-DD)",
-            "editor": "textfield",
-            "nullable": true
-        },
-        "currency": {
-            "title": "Currency",
-            "type": "string",
-            "description": "Currency for pricing data",
-            "editor": "textfield",
-            "default": "USD",
-            "prefill": "USD"
-        },
-        "maxResults": {
-            "title": "Max Results",
-            "type": "integer",
-            "description": "Maximum number of listings to scrape and analyze",
-            "editor": "number",
-            "default": 50,
-            "prefill": 50,
-            "minimum": 10,
-            "maximum": 200
         }
     },
     "required": ["location"]

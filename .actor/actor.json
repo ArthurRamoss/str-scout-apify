@@ -1,14 +1,16 @@
 {
     "actorSpecification": 1,
-    "name": "str-scout-airbnb-analyzer",
-    "version": "1.0",
+    "name": "str-scout",
+    "version": "0.1",
     "buildTag": "latest",
-    "minMemoryMbytes": 256,
+    "minMemoryMbytes": 512,
     "maxMemoryMbytes": 4096,
     "usesStandbyMode": true,
     "dockerfile": "../Dockerfile",
     "readme": "./ACTOR.md",
     "input": "./INPUT_SCHEMA.json",
+    "output": "./OUTPUT_SCHEMA.json",
+    "webServerSchema": "./web_server_openapi.json",
     "storages": {
         "dataset": "./DATASET_SCHEMA.json"
     }

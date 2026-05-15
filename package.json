@@ -1,32 +1,38 @@
 {
   "name": "str-scout-apify",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "type": "module",
-  "description": "Airbnb short-term rental market analyzer — revenue estimates, ADR, occupancy, saturation, amenity gaps, and AI investment summaries. The AirDNA alternative as an Apify Actor.",
+  "description": "Apify Actor + MCP server for short-term rental market intelligence — search, market analysis, regulations, and arbitrage scoring.",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r src/data dist/data",
     "start": "node dist/server.js",
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "audit": "bash scripts/audit.sh"
   },
   "keywords": [
     "apify",
     "actor",
-    "airbnb",
+    "mcp",
+    "model-context-protocol",
     "short-term-rental",
     "str",
     "real-estate",
     "market-analysis",
-    "revenue-estimation",
-    "investment",
-    "airdna-alternative"
+    "arbitrage",
+    "regulations"
   ],
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "apify": "^3.0.0",
     "apify-client": "^2.22.2",
+    "csv-parse": "^6.2.1",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "ioredis": "^5.10.0"
+    "ioredis": "^5.10.0",
+    "zod": "^3.25.76",
+    "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

@@ -1,0 +1,215 @@
+{
+  "_notes": "Inside Airbnb city -> latest snapshot mapping. URL pattern: https://data.insideairbnb.com/<country>/<region>/<city>/<YYYY-MM-DD>/data/listings.csv. Refresh `lastSnapshot` quarterly (March/June/September/December). If a city's URL 404s at runtime, dataSource.ts gracefully falls back to the live scraper. Aliases enable fuzzy matching by normalizeCacheKey().",
+  "cities": {
+    "austin-tx": {
+      "displayName": "Austin, TX",
+      "aliases": ["austin", "austin-texas"],
+      "country": "US",
+      "datasetUrl": "https://data.insideairbnb.com/united-states/tx/austin/2024-09-13/data/listings.csv",
+      "lastSnapshot": "2024-09-13"
+    },
+    "new-york-ny": {
+      "displayName": "New York, NY",
+      "aliases": ["new-york", "nyc", "new-york-city", "manhattan", "brooklyn"],
+      "country": "US",
+      "datasetUrl": "https://data.insideairbnb.com/united-states/ny/new-york-city/2024-09-04/data/listings.csv",
+      "lastSnapshot": "2024-09-04"
+    },
+    "los-angeles-ca": {
+      "displayName": "Los Angeles, CA",
+      "aliases": ["los-angeles", "la"],
+      "country": "US",
+      "datasetUrl": "https://data.insideairbnb.com/united-states/ca/los-angeles/2024-09-04/data/listings.csv",
+      "lastSnapshot": "2024-09-04"
+    },
+    "san-francisco-ca": {
+      "displayName": "San Francisco, CA",
+      "aliases": ["san-francisco", "sf"],
+      "country": "US",
+      "datasetUrl": "https://data.insideairbnb.com/united-states/ca/san-francisco/2024-09-03/data/listings.csv",
+      "lastSnapshot": "2024-09-03"
+    },
+    "boston-ma": {
+      "displayName": "Boston, MA",
+      "aliases": ["boston"],
+      "country": "US",
+      "datasetUrl": "https://data.insideairbnb.com/united-states/ma/boston/2024-09-23/data/listings.csv",
+      "lastSnapshot": "2024-09-23"
+    },
+    "chicago-il": {
+      "displayName": "Chicago, IL",
+      "aliases": ["chicago"],
+      "country": "US",
+      "datasetUrl": "https://data.insideairbnb.com/united-states/il/chicago/2024-09-21/data/listings.csv",
+      "lastSnapshot": "2024-09-21"
+    },
+    "seattle-wa": {
+      "displayName": "Seattle, WA",
+      "aliases": ["seattle"],
+      "country": "US",
+      "datasetUrl": "https://data.insideairbnb.com/united-states/wa/seattle/2024-09-19/data/listings.csv",
+      "lastSnapshot": "2024-09-19"
+    },
+    "nashville-tn": {
+      "displayName": "Nashville, TN",
+      "aliases": ["nashville"],
+      "country": "US",
+      "datasetUrl": "https://data.insideairbnb.com/united-states/tn/nashville/2024-09-12/data/listings.csv",
+      "lastSnapshot": "2024-09-12"
+    },
+    "lisbon": {
+      "displayName": "Lisbon",
+      "aliases": ["lisboa", "lisbon-portugal"],
+      "country": "PT",
+      "datasetUrl": "https://data.insideairbnb.com/portugal/lisbon/lisbon/2024-09-22/data/listings.csv",
+      "lastSnapshot": "2024-09-22"
+    },
+    "porto": {
+      "displayName": "Porto",
+      "aliases": ["oporto"],
+      "country": "PT",
+      "datasetUrl": "https://data.insideairbnb.com/portugal/norte/porto/2024-09-22/data/listings.csv",
+      "lastSnapshot": "2024-09-22"
+    },
+    "barcelona": {
+      "displayName": "Barcelona",
+      "aliases": ["barcelona-spain"],
+      "country": "ES",
+      "datasetUrl": "https://data.insideairbnb.com/spain/catalonia/barcelona/2024-09-06/data/listings.csv",
+      "lastSnapshot": "2024-09-06"
+    },
+    "madrid": {
+      "displayName": "Madrid",
+      "aliases": ["madrid-spain"],
+      "country": "ES",
+      "datasetUrl": "https://data.insideairbnb.com/spain/comunidad-de-madrid/madrid/2024-09-12/data/listings.csv",
+      "lastSnapshot": "2024-09-12"
+    },
+    "paris": {
+      "displayName": "Paris",
+      "aliases": ["paris-france"],
+      "country": "FR",
+      "datasetUrl": "https://data.insideairbnb.com/france/ile-de-france/paris/2024-09-06/data/listings.csv",
+      "lastSnapshot": "2024-09-06"
+    },
+    "london": {
+      "displayName": "London",
+      "aliases": ["london-uk", "london-england"],
+      "country": "GB",
+      "datasetUrl": "https://data.insideairbnb.com/united-kingdom/england/london/2024-09-06/data/listings.csv",
+      "lastSnapshot": "2024-09-06"
+    },
+    "berlin": {
+      "displayName": "Berlin",
+      "aliases": ["berlin-germany"],
+      "country": "DE",
+      "datasetUrl": "https://data.insideairbnb.com/germany/be/berlin/2024-09-22/data/listings.csv",
+      "lastSnapshot": "2024-09-22"
+    },
+    "amsterdam": {
+      "displayName": "Amsterdam",
+      "aliases": ["amsterdam-netherlands"],
+      "country": "NL",
+      "datasetUrl": "https://data.insideairbnb.com/the-netherlands/north-holland/amsterdam/2024-09-05/data/listings.csv",
+      "lastSnapshot": "2024-09-05"
+    },
+    "rome": {
+      "displayName": "Rome",
+      "aliases": ["roma", "rome-italy"],
+      "country": "IT",
+      "datasetUrl": "https://data.insideairbnb.com/italy/lazio/rome/2024-09-19/data/listings.csv",
+      "lastSnapshot": "2024-09-19"
+    },
+    "milan": {
+      "displayName": "Milan",
+      "aliases": ["milano"],
+      "country": "IT",
+      "datasetUrl": "https://data.insideairbnb.com/italy/lombardy/milan/2024-09-22/data/listings.csv",
+      "lastSnapshot": "2024-09-22"
+    },
+    "athens": {
+      "displayName": "Athens",
+      "aliases": ["athens-greece"],
+      "country": "GR",
+      "datasetUrl": "https://data.insideairbnb.com/greece/attica/athens/2024-09-23/data/listings.csv",
+      "lastSnapshot": "2024-09-23"
+    },
+    "sydney": {
+      "displayName": "Sydney",
+      "aliases": ["sydney-australia"],
+      "country": "AU",
+      "datasetUrl": "https://data.insideairbnb.com/australia/nsw/sydney/2024-09-08/data/listings.csv",
+      "lastSnapshot": "2024-09-08"
+    },
+    "melbourne": {
+      "displayName": "Melbourne",
+      "aliases": ["melbourne-australia"],
+      "country": "AU",
+      "datasetUrl": "https://data.insideairbnb.com/australia/vic/melbourne/2024-09-09/data/listings.csv",
+      "lastSnapshot": "2024-09-09"
+    },
+    "mexico-city": {
+      "displayName": "Mexico City",
+      "aliases": ["cdmx", "ciudad-de-mexico", "mexico-df"],
+      "country": "MX",
+      "datasetUrl": "https://data.insideairbnb.com/mexico/df/mexico-city/2024-09-26/data/listings.csv",
+      "lastSnapshot": "2024-09-26"
+    },
+    "buenos-aires": {
+      "displayName": "Buenos Aires",
+      "aliases": ["buenos-aires-argentina"],
+      "country": "AR",
+      "datasetUrl": "https://data.insideairbnb.com/argentina/ciudad-autonoma-de-buenos-aires/buenos-aires/2024-09-25/data/listings.csv",
+      "lastSnapshot": "2024-09-25"
+    },
+    "rio-de-janeiro": {
+      "displayName": "Rio de Janeiro",
+      "aliases": ["rio"],
+      "country": "BR",
+      "datasetUrl": "https://data.insideairbnb.com/brazil/rj/rio-de-janeiro/2024-09-25/data/listings.csv",
+      "lastSnapshot": "2024-09-25"
+    },
+    "vienna": {
+      "displayName": "Vienna",
+      "aliases": ["wien"],
+      "country": "AT",
+      "datasetUrl": "https://data.insideairbnb.com/austria/vienna/vienna/2024-09-13/data/listings.csv",
+      "lastSnapshot": "2024-09-13"
+    },
+    "copenhagen": {
+      "displayName": "Copenhagen",
+      "aliases": ["kobenhavn"],
+      "country": "DK",
+      "datasetUrl": "https://data.insideairbnb.com/denmark/hovedstaden/copenhagen/2024-09-30/data/listings.csv",
+      "lastSnapshot": "2024-09-30"
+    },
+    "edinburgh": {
+      "displayName": "Edinburgh",
+      "aliases": ["edinburgh-scotland"],
+      "country": "GB",
+      "datasetUrl": "https://data.insideairbnb.com/united-kingdom/scotland/edinburgh/2024-09-29/data/listings.csv",
+      "lastSnapshot": "2024-09-29"
+    },
+    "asheville-nc": {
+      "displayName": "Asheville, NC",
+      "aliases": ["asheville"],
+      "country": "US",
+      "datasetUrl": "https://data.insideairbnb.com/united-states/nc/asheville/2024-09-12/data/listings.csv",
+      "lastSnapshot": "2024-09-12"
+    },
+    "denver-co": {
+      "displayName": "Denver, CO",
+      "aliases": ["denver"],
+      "country": "US",
+      "datasetUrl": "https://data.insideairbnb.com/united-states/co/denver/2024-09-25/data/listings.csv",
+      "lastSnapshot": "2024-09-25"
+    },
+    "san-diego-ca": {
+      "displayName": "San Diego, CA",
+      "aliases": ["san-diego"],
+      "country": "US",
+      "datasetUrl": "https://data.insideairbnb.com/united-states/ca/san-diego/2024-09-21/data/listings.csv",
+      "lastSnapshot": "2024-09-21"
+    }
+  }
+}
