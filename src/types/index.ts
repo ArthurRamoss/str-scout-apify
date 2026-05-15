@@ -103,6 +103,7 @@ export interface AirbnbListing {
   subtitle?: string;
   starRating?: number;
   reviewsCount?: number;
+  reviewsPerMonth?: number;
   dates?: string;
   bedInfo?: string;
   originalPrice?: string;

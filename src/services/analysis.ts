@@ -115,9 +115,21 @@ function filterByPropertyType(
 // Revenue Estimation (Review Velocity Model)
 // ==========================================
 
-const REVIEW_RATE = 0.6; // 60% of guests leave reviews
+const REVIEW_RATE = 0.5; // ~50% of guests leave reviews (industry consensus)
 const DEFAULT_AVG_STAY = 3.5; // nights
-const ASSUMED_LISTING_AGE_MONTHS = 24; // conservative default if unknown
+const ASSUMED_LISTING_AGE_MONTHS = 36; // mature-market default (was 24 — too short, underestimated occupancy)
+
+// Per-listing reviews/month. Use the direct field if the data source provides
+// it (Inside Airbnb publishes `reviews_per_month` per listing), otherwise fall
+// back to dividing total reviews by assumed listing age.
+function reviewsPerMonthFor(l: AirbnbListing): number | null {
+  if (typeof l.reviewsPerMonth === "number" && l.reviewsPerMonth > 0) {
+    return l.reviewsPerMonth;
+  }
+  const total = extractReviewCount(l);
+  if (total <= 0) return null;
+  return total / ASSUMED_LISTING_AGE_MONTHS;
+}
 
 export function estimateRevenue(
   listings: AirbnbListing[]
@@ -127,12 +139,12 @@ export function estimateRevenue(
     .filter((p): p is number => p !== null)
     .sort((a, b) => a - b);
 
-  const reviewCounts = listings
-    .map(extractReviewCount)
-    .filter((r) => r > 0)
+  const reviewsPerMonth = listings
+    .map(reviewsPerMonthFor)
+    .filter((r): r is number => r !== null && r > 0)
     .sort((a, b) => a - b);
 
-  if (prices.length === 0 || reviewCounts.length === 0) {
+  if (prices.length === 0 || reviewsPerMonth.length === 0) {
     return {
       revenue: {
         lowEstimate: 0,
@@ -149,38 +161,36 @@ export function estimateRevenue(
     };
   }
 
-  // ADR percentiles
   const adrP25 = percentile(prices, 25);
   const adrP50 = percentile(prices, 50);
   const adrP75 = percentile(prices, 75);
 
-  // Occupancy via review velocity
-  // reviews/month → bookings/month → nights/month → occupancy
-  const reviewsPerMonth = reviewCounts.map(
-    (rc) => rc / ASSUMED_LISTING_AGE_MONTHS
-  );
+  // Occupancy from review velocity: reviews/month → bookings/month → nights/month → occupancy
   const bookingsPerMonth = reviewsPerMonth.map((rpm) => rpm / REVIEW_RATE);
-  const nightsPerMonth = bookingsPerMonth.map(
-    (bpm) => Math.min(bpm * DEFAULT_AVG_STAY, 30)
-  );
-  const occupancyRates = nightsPerMonth.map((n) => Math.min(n / 30, 1.0));
+  const nightsPerMonth = bookingsPerMonth.map((bpm) => Math.min(bpm * DEFAULT_AVG_STAY, 30));
+  const occupancyRates = nightsPerMonth.map((n) => Math.min(n / 30, 1.0)).sort((a, b) => a - b);
 
-  const occP25 = percentile(occupancyRates.sort((a, b) => a - b), 25);
+  const occP25 = percentile(occupancyRates, 25);
   const occP50 = percentile(occupancyRates, 50);
   const occP75 = percentile(occupancyRates, 75);
 
-  // Annual revenue = ADR × occupancy × 365
   const lowEstimate = Math.round(adrP25 * occP25 * 365);
   const midEstimate = Math.round(adrP50 * occP50 * 365);
   const highEstimate = Math.round(adrP75 * occP75 * 365);
 
-  // Confidence based on sample size
   let confidenceLevel: "high" | "medium" | "low";
   if (listings.length >= 50) confidenceLevel = "high";
   else if (listings.length >= 20) confidenceLevel = "medium";
   else confidenceLevel = "low";
 
-  const methodology = `Review velocity model: median ${median(reviewsPerMonth).toFixed(1)} reviews/month across ${listings.length} listings, estimated ${(REVIEW_RATE * 100).toFixed(0)}% review rate, ${DEFAULT_AVG_STAY} avg night stay. Revenue = ADR × estimated occupancy × 365.`;
+  const usingDirect = listings.some(
+    (l) => typeof l.reviewsPerMonth === "number" && l.reviewsPerMonth > 0,
+  );
+  const source = usingDirect
+    ? "direct reviews/month field"
+    : `total reviews ÷ ${ASSUMED_LISTING_AGE_MONTHS}-month assumed listing age`;
+
+  const methodology = `Review velocity model (${source}): median ${median(reviewsPerMonth).toFixed(2)} reviews/month across ${reviewsPerMonth.length} listings, assumed ${(REVIEW_RATE * 100).toFixed(0)}% review rate, ${DEFAULT_AVG_STAY} avg night stay. Revenue = ADR × estimated occupancy × 365.`;
 
   return {
     revenue: {
@@ -193,7 +203,7 @@ export function estimateRevenue(
     occupancy: {
       estimatedRate: Math.round(occP50 * 100) / 100,
       confidenceLevel,
-      basedOn: `Review velocity model across ${reviewCounts.length} listings with review data. Median ${median(reviewsPerMonth).toFixed(1)} reviews/month → ${(occP50 * 100).toFixed(0)}% estimated occupancy.`,
+      basedOn: `Review velocity model (${source}) across ${reviewsPerMonth.length} listings. Median ${median(reviewsPerMonth).toFixed(2)} reviews/month → ${(occP50 * 100).toFixed(0)}% estimated occupancy.`,
     },
   };
 }

@@ -114,6 +114,7 @@ function rowToListing(row: OpenDataRow): AirbnbListing {
   const lng = parseNum(row.longitude);
   const bedroomsN = parseNum(row.bedrooms);
   const reviewsN = parseNum(row.number_of_reviews) ?? 0;
+  const reviewsPerMonth = parseNum(row.reviews_per_month);
   const ratingN = parseNum(row.review_scores_rating);
 
   return {
@@ -126,6 +127,7 @@ function rowToListing(row: OpenDataRow): AirbnbListing {
     coordinates: lat !== null && lng !== null ? { latitude: lat, longitude: lng } : undefined,
     isSuperHost: row.host_is_superhost === "t",
     reviewsCount: Math.round(reviewsN),
+    reviewsPerMonth: reviewsPerMonth ?? undefined,
     rating: ratingN !== null
       ? { reviewsCount: Math.round(reviewsN), guestSatisfaction: ratingN > 5 ? ratingN / 20 : ratingN }
       : { reviewsCount: Math.round(reviewsN) },
