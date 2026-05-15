@@ -8,49 +8,84 @@ import type { ToolResponse } from "./marketAnalysis.js";
 export type SearchListingsInput = z.infer<typeof searchListingsSchema>;
 
 function extractPrice(l: AirbnbListing): number | null {
-  if (typeof l.price === "object" && l.price?.amount) {
-    const n = parseFloat(String(l.price.amount).replace(/[^\d.]/g, ""));
-    if (Number.isFinite(n) && n > 0) return n;
-  }
-  if (typeof l.price === "object" && l.price?.label) {
-    const m = String(l.price.label).match(/\$?([\d,]+)/);
-    if (m) {
-      const n = parseFloat(m[1].replace(/,/g, ""));
+  if (typeof l.costPerNight === "number" && l.costPerNight > 0) return l.costPerNight;
+  if (l.price && typeof l.price === "object") {
+    if (l.price.amount) {
+      const n = parseFloat(String(l.price.amount).replace(/[^\d.]/g, ""));
       if (Number.isFinite(n) && n > 0) return n;
+    }
+    if (l.price.label) {
+      const m = String(l.price.label).match(/\$?([\d,]+)/);
+      if (m) {
+        const n = parseFloat(m[1].replace(/,/g, ""));
+        if (Number.isFinite(n) && n > 0) return n;
+      }
     }
   }
   if (typeof l.pricing === "number" && l.pricing > 0) return l.pricing;
+  if (l.pricing?.rate?.amount) return l.pricing.rate.amount;
+  if (typeof l.originalPrice === "string") {
+    const n = parseFloat(l.originalPrice.replace(/[^\d.]/g, ""));
+    if (Number.isFinite(n) && n > 0) return n;
+  }
   return null;
 }
 
 function extractRating(l: AirbnbListing): number | null {
+  if (typeof l.starRating === "number" && l.starRating > 0) return l.starRating;
   if (l.rating?.guestSatisfaction) return l.rating.guestSatisfaction;
-  if (typeof l.starRating === "number") return l.starRating;
+  // Parse from title like "... ★4.95 · ..."
+  const titleMatch = (l.title ?? l.name ?? "").match(/★\s*(\d+(?:\.\d+)?)/);
+  if (titleMatch) {
+    const n = parseFloat(titleMatch[1]);
+    if (Number.isFinite(n)) return n;
+  }
   return null;
 }
 
 function extractBedrooms(l: AirbnbListing): number | null {
-  const item = l.subDescription?.items?.[0] ?? "";
-  const m = item.match(/^(\d+)\s+bedroom/);
+  // Try title: "... · 2 bedrooms · ..."
+  const fromTitle = (l.title ?? l.name ?? "").match(/(\d+)\s+bedroom/i);
+  if (fromTitle) return parseInt(fromTitle[1], 10);
+  // Try bedInfo / subDescription
+  const item = l.subDescription?.items?.[0] ?? l.bedInfo ?? "";
+  const m = item.match(/(\d+)\s+bedroom/i);
   return m ? parseInt(m[1], 10) : null;
 }
 
-function extractBathrooms(_l: AirbnbListing): number | null {
-  return null;
+function extractBathrooms(l: AirbnbListing): number | null {
+  const text = (l.title ?? l.name ?? l.bedInfo ?? "");
+  const m = text.match(/(\d+(?:\.\d+)?)\s+(?:private\s+)?bath/i);
+  return m ? parseFloat(m[1]) : null;
+}
+
+function extractReviewCount(l: AirbnbListing): number {
+  if (typeof l.reviewsCount === "number") return l.reviewsCount;
+  if (l.rating?.reviewsCount) return l.rating.reviewsCount;
+  return 0;
+}
+
+function extractId(l: AirbnbListing): string {
+  if (l.id) return l.id;
+  // Try to parse from url/propertyUrl
+  const url = l.url ?? l.propertyUrl ?? "";
+  const m = url.match(/\/rooms\/(\d+)/);
+  return m ? m[1] : "";
 }
 
 function toCompact(l: AirbnbListing): CompactListing {
   const lat = l.coordinates?.latitude ?? l.location?.latitude ?? null;
   const lng = l.coordinates?.longitude ?? l.location?.longitude ?? null;
+  const id = extractId(l);
   return {
-    id: l.id ?? "",
+    id,
     name: l.title ?? l.name ?? "Unnamed listing",
-    url: l.url ?? l.propertyUrl ?? (l.id ? `https://www.airbnb.com/rooms/${l.id}` : ""),
+    url: l.url ?? l.propertyUrl ?? (id ? `https://www.airbnb.com/rooms/${id}` : ""),
     pricePerNight: extractPrice(l),
     bedrooms: extractBedrooms(l),
     bathrooms: extractBathrooms(l),
     rating: extractRating(l),
-    reviewCount: l.reviewsCount ?? l.rating?.reviewsCount ?? 0,
+    reviewCount: extractReviewCount(l),
     isSuperhost: Boolean(l.isSuperHost ?? l.host?.isSuperHost ?? l.hostDetails?.isSuperhost ?? false),
     lat,
     lng,

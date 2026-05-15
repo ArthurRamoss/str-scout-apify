@@ -4,13 +4,13 @@
     "description": "Storage pointers for batch-mode runs. Standby/MCP tool calls return inline JSON and do not write to these stores.",
     "properties": {
         "dataset": {
-            "type": "object",
+            "type": "string",
             "title": "Market analyses",
             "description": "Each batch run pushes one MarketAnalysis record.",
             "template": "{{links.publicRunUrl}}/dataset"
         },
         "keyValueStore": {
-            "type": "object",
+            "type": "string",
             "title": "Run logs and metadata",
             "template": "{{links.publicRunUrl}}/key-value-store"
         }

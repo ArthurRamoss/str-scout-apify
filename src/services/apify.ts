@@ -6,6 +6,84 @@ const FALLBACK_ACTOR = "memo23/airbnb-scraper";
 const APIFY_TIMEOUT = 300; // seconds
 const DEFAULT_COUNT = 100;
 
+// Normalize raw scraper output (which uses snake_case fields like
+// `listing_url`, `pricing_base_price`, `accommodation_bedrooms`) into the
+// internal AirbnbListing shape that analysis.ts and the tools expect.
+function normalize(raw: any): AirbnbListing {
+  const url: string | undefined = raw.listing_url ?? raw.url;
+  const idFromUrl = url ? (url.match(/\/rooms\/(\d+)/)?.[1] ?? "") : "";
+  const price = Number(raw.pricing_base_price ?? raw.pricing_original_price ?? raw.booking_price ?? raw.pricing_total_price ?? 0);
+
+  // Collect boolean amenity_* flags into FlatAmenity-style array
+  const flatAmenities: Array<{ groupName: string; title: string; available: boolean }> = [];
+  for (const k of Object.keys(raw)) {
+    if (k.startsWith("amenity_") && raw[k] === true) {
+      const title = k.slice("amenity_".length)
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+      flatAmenities.push({ groupName: "Amenities", title, available: true });
+    }
+  }
+  // Also accept already-structured amenities if scraper returns them
+  const structured = raw.amenities_structured ?? raw.amenities;
+  const amenitiesField = flatAmenities.length > 0
+    ? flatAmenities
+    : Array.isArray(structured)
+      ? structured
+      : undefined;
+
+  return {
+    id: raw.id || idFromUrl,
+    title: raw.title,
+    name: raw.title ?? raw.property_name,
+    url: url ?? (idFromUrl ? `https://www.airbnb.com/rooms/${idFromUrl}` : undefined),
+    propertyUrl: url,
+    roomType: raw.room_type,
+    type: raw.property_type,
+    coordinates: (raw.location_latitude && raw.location_longitude)
+      ? { latitude: Number(raw.location_latitude), longitude: Number(raw.location_longitude) }
+      : undefined,
+    location: (raw.location_latitude && raw.location_longitude)
+      ? { latitude: Number(raw.location_latitude), longitude: Number(raw.location_longitude) }
+      : undefined,
+    isSuperHost: Boolean(raw.host_is_superhost),
+    starRating: Number(raw.review_overall_rating ?? raw.review_guest_satisfaction_overall ?? 0) || undefined,
+    reviewsCount: Number(raw.review_count ?? 0),
+    rating: {
+      reviewsCount: Number(raw.review_count ?? 0),
+      guestSatisfaction: Number(raw.review_guest_satisfaction_overall ?? raw.review_overall_rating ?? 0) || undefined,
+      accuracy: Number(raw.review_accuracy ?? 0) || undefined,
+      cleanliness: Number(raw.review_cleanliness ?? 0) || undefined,
+      communication: Number(raw.review_communication ?? 0) || undefined,
+      location: Number(raw.review_location ?? 0) || undefined,
+      value: Number(raw.review_value ?? 0) || undefined,
+    },
+    host: {
+      id: raw.host_id,
+      name: raw.host_name,
+      isSuperHost: Boolean(raw.host_is_superhost),
+    },
+    hostDetails: {
+      id: raw.host_id,
+      name: raw.host_name,
+      isSuperhost: Boolean(raw.host_is_superhost),
+    },
+    price: price > 0
+      ? { amount: String(price) }
+      : undefined,
+    costPerNight: price > 0 ? price : null,
+    amenities: amenitiesField,
+    // Stash bedroom info for searchListings extractor fallback
+    subDescription: typeof raw.accommodation_bedrooms === "number"
+      ? { items: [`${raw.accommodation_bedrooms} bedroom${raw.accommodation_bedrooms === 1 ? "" : "s"}`] }
+      : undefined,
+    bedInfo: raw.accommodation_bedrooms != null
+      ? `${raw.accommodation_bedrooms} bedrooms, ${raw.accommodation_beds ?? "?"} beds, ${raw.accommodation_bathrooms ?? "?"} baths`
+      : undefined,
+    maxGuestCapacity: typeof raw.accommodation_guests === "number" ? raw.accommodation_guests : undefined,
+  };
+}
+
 let client: ApifyClient | null = null;
 
 function getClient(): ApifyClient {
@@ -49,7 +127,7 @@ async function scrapePrimary(options: ScrapeOptions): Promise<AirbnbListing[]> {
       urls: [searchUrl],
       currency: "USD",
       scrapeDetail: true,
-      scrapeAvailability: false,
+      scrapeAvailability: true,
       scrapeReviews: false,
       count,
     },
@@ -67,7 +145,7 @@ async function scrapePrimary(options: ScrapeOptions): Promise<AirbnbListing[]> {
     throw new Error("Primary scraper returned 0 results");
   }
 
-  return items as AirbnbListing[];
+  return (items as any[]).map(normalize);
 }
 
 // Fallback: memo23/airbnb-scraper
@@ -96,7 +174,7 @@ async function scrapeFallback(options: ScrapeOptions): Promise<AirbnbListing[]> 
     `[apify] FALLBACK: ${items.length} listings in ${elapsed}s (cost: $${run.usageTotalUsd ?? "?"})`
   );
 
-  return items as AirbnbListing[];
+  return (items as any[]).map(normalize);
 }
 
 // Main entry: try primary, fallback on failure
