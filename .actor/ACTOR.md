@@ -1,5 +1,7 @@
 # STR Scout — Short-Term Rental Market Intelligence
 
+> ⚠️ **Unofficial.** This Actor is not affiliated with, endorsed by, or sponsored by Airbnb, Inc., or any other third-party platform. All trademarks belong to their respective owners.
+
 Short-term rental market intelligence with **4 tools** accessible via **MCP**, **REST**, or batch run. Built for STR investors, hosts, property managers, and AI agents that need market data on demand.
 
 ## What you get
@@ -11,7 +13,7 @@ Short-term rental market intelligence with **4 tools** accessible via **MCP**, *
 
 ## Disclaimer
 
-> STR Scout aggregates publicly available data and analytical estimates. Output is informational only and does not constitute investment, legal, or tax advice. Regulatory data may be out of date — verify with the local jurisdiction before transacting. STR Scout is not affiliated with, endorsed by, or sponsored by Airbnb, Inc., or any third-party platform.
+> **This is an unofficial tool.** STR Scout aggregates publicly available data and analytical estimates. Output is informational only and does not constitute investment, legal, or tax advice. Regulatory data may be out of date — verify with the local jurisdiction before transacting. STR Scout is not affiliated with, endorsed by, or sponsored by Airbnb, Inc., or any third-party platform. All names, logos, and trademarks referenced are the property of their respective owners.
 
 ## Tools and pricing
 
