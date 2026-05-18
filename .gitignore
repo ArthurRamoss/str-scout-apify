@@ -5,3 +5,15 @@ dist/
 apify_storage/
 storage/
 .cursor/
+
+# Marketing infrastructure — secrets and session-tied data MUST stay out of git
+marketing/.env
+marketing/.env.*
+!marketing/.env.example
+marketing/cookies/
+marketing/screenshots/
+marketing/scripts/playwright/node_modules/
+marketing/scripts/playwright/test-results/
+
+# Landing page deploy artifacts
+landing/.vercel/

@@ -8,12 +8,13 @@ cd "$(dirname "$0")/.."
 EXIT=0
 
 echo "=== [1/3] Forbidden public terms in user-facing surfaces ==="
-# Scans .actor/* (Store listing), public-facing schemas/mcp/http directories, and
-# README.md. package.json dependency names (e.g. @google/generative-ai) are
-# unavoidable npm package IDs — they're mitigated by the "Hide source files"
-# toggle in the Apify Console publish flow, not by renaming.
+# Scans .actor/* (Store listing), public-facing schemas/mcp/http directories,
+# README.md, landing/* (public website), and marketing/drafts + marketing/registries
+# (where copy goes live on Reddit/Twitter/etc.). package.json dependency names
+# (e.g. @google/generative-ai) are unavoidable npm package IDs — mitigated by
+# the "Hide source files" toggle in the Apify Console publish flow.
 HITS=$(grep -RniE 'inside.?airbnb|curious_coder|memo23|gemini|google.?generative' \
-  .actor/ src/schemas/ src/mcp/ src/http/ README.md 2>/dev/null || true)
+  .actor/ src/schemas/ src/mcp/ src/http/ README.md landing/ marketing/drafts/ marketing/registries/ 2>/dev/null || true)
 # Also check package.json's description and keywords arrays explicitly (cheap & precise)
 PKG_DESC_KEYS=$(grep -nE '^\s*"(description|keywords)"' package.json | head -5 || true)
 PKG_HITS=$(grep -niE -A 12 '"keywords"\s*:\s*\[' package.json | grep -iE 'inside.?airbnb|curious_coder|memo23|gemini|google.?generative|airdna-alternative' || true)
@@ -29,7 +30,7 @@ fi
 
 echo
 echo "=== [2/3] Internal 'source' field leaking into responses ==="
-HITS=$(grep -RnE '"source"\s*:\s*"(open-data|live-scrape)"' .actor/ src/http/ src/mcp/ 2>/dev/null || true)
+HITS=$(grep -RnE '"source"\s*:\s*"(open-data|live-scrape)"' .actor/ src/http/ src/mcp/ marketing/drafts/ marketing/registries/ landing/ 2>/dev/null || true)
 if [ -n "$HITS" ]; then
   echo "$HITS"
   EXIT=1
